@@ -1,4 +1,4 @@
-\# SupportFlow
+# SupportFlow
 
 
 
@@ -10,29 +10,29 @@ The project provides authentication, role-based authorization, ticket management
 
 
 
-\## Features
+## Features
 
 
 
-\### Authentication
+### Authentication
 
 
 
-\- User registration
+- User registration
 
-\- User login
+- User login
 
-\- JWT authentication
+- JWT authentication
 
-\- Password hashing with BCrypt
+- Password hashing with BCrypt
 
-\- Authenticated user profile endpoint
+- Authenticated user profile endpoint
 
-\- Active/inactive user support
+- Active/inactive user support
 
 
 
-\### Role-Based Authorization
+### Role-Based Authorization
 
 
 
@@ -40,11 +40,11 @@ SupportFlow currently supports three roles:
 
 
 
-\- \*\*Customer\*\* — creates and views their own tickets
+- **Customer** — creates and views their own tickets
 
-\- \*\*Agent\*\* — handles support tickets and updates ticket statuses
+- **Agent** — handles support tickets and updates ticket statuses
 
-\- \*\*Admin\*\* — manages ticket assignment and administrative operations
+- **Admin** — manages ticket assignment and administrative operations
 
 
 
@@ -52,7 +52,7 @@ Authorization is enforced using JWT claims and ASP.NET Core role-based authoriza
 
 
 
-\### Ticket Management
+### Ticket Management
 
 
 
@@ -60,27 +60,27 @@ Tickets contain:
 
 
 
-\- Unique ticket number
+- Unique ticket number
 
-\- Title
+- Title
 
-\- Description
+- Description
 
-\- Status
+- Status
 
-\- Priority
+- Priority
 
-\- Category
+- Category
 
-\- Creator
+- Creator
 
-\- Assigned agent
+- Assigned agent
 
-\- Creation timestamp
+- Creation timestamp
 
-\- Update timestamp
+- Update timestamp
 
-\- Resolution timestamp
+- Resolution timestamp
 
 
 
@@ -88,13 +88,13 @@ Current ticket statuses:
 
 
 
-\- `Open`
+- `Open`
 
-\- `InProgress`
+- `InProgress`
 
-\- `Resolved`
+- `Resolved`
 
-\- `Closed`
+- `Closed`
 
 
 
@@ -102,13 +102,13 @@ Priorities:
 
 
 
-\- `Low`
+- `Low`
 
-\- `Medium`
+- `Medium`
 
-\- `High`
+- `High`
 
-\- `Critical`
+- `Critical`
 
 
 
@@ -116,23 +116,23 @@ Categories:
 
 
 
-\- `General`
+- `General`
 
-\- `Technical`
+- `Technical`
 
-\- `Billing`
+- `Billing`
 
-\- `Account`
+- `Account`
 
-\- `FeatureRequest`
+- `FeatureRequest`
 
-\- `Bug`
+- `Bug`
 
-\- `Other`
+- `Other`
 
 
 
-\### Ticket Assignment
+### Ticket Assignment
 
 
 
@@ -144,65 +144,65 @@ The backend validates that the selected user exists, is active, and has the corr
 
 
 
-\## Tech Stack
+## Tech Stack
 
 
 
-\### Backend
+### Backend
 
 
 
-\- C#
+- C#
 
-\- .NET 10
+- .NET 10
 
-\- ASP.NET Core Web API
+- ASP.NET Core Web API
 
-\- Entity Framework Core
+- Entity Framework Core
 
-\- MySQL 8
-
-
-
-\### Authentication \& Security
+- MySQL 8
 
 
 
-\- JWT Bearer Authentication
-
-\- BCrypt password hashing
-
-\- Role-based authorization
-
-\- .NET User Secrets for local secrets
+### Authentication \& Security
 
 
 
-\### Development
+- JWT Bearer Authentication
+
+- BCrypt password hashing
+
+- Role-based authorization
+
+- .NET User Secrets for local secrets
 
 
 
-\- Git
-
-\- GitHub
-
-\- PowerShell
-
-\- Visual Studio
-
-\- EF Core Migrations
+### Development
 
 
 
-\### Testing
+- Git
+
+- GitHub
+
+- PowerShell
+
+- Visual Studio
+
+- EF Core Migrations
 
 
 
-\- xUnit project structure
+### Testing
 
 
 
-\## Architecture
+- xUnit project structure
+
+
+
+## Architecture
 
 
 
@@ -270,7 +270,7 @@ SupportFlow
 
 
 
-\### Dependency Flow
+### Dependency Flow
 
 
 
@@ -316,7 +316,7 @@ The API layer exposes the system through REST endpoints.
 
 
 
-\## Domain Model
+## Domain Model
 
 
 
@@ -324,7 +324,7 @@ The current domain contains three main entities:
 
 
 
-\### User
+### User
 
 
 
@@ -336,17 +336,17 @@ A user can:
 
 
 
-\- Create tickets
+- Create tickets
 
-\- Be assigned tickets as an agent
+- Be assigned tickets as an agent
 
-\- Write comments
+- Write comments
 
-\- Have a `Customer`, `Agent`, or `Admin` role
+- Have a `Customer`, `Agent`, or `Admin` role
 
 
 
-\### Ticket
+### Ticket
 
 
 
@@ -358,7 +358,7 @@ Each ticket belongs to its creator and can optionally be assigned to an agent.
 
 
 
-\### Comment
+### Comment
 
 
 
@@ -370,7 +370,7 @@ The model also supports internal comments through the `IsInternal` property.
 
 
 
-\## API
+## API
 
 
 
@@ -386,7 +386,7 @@ http://localhost:5263
 
 
 
-\### Authentication
+### Authentication
 
 
 
@@ -402,7 +402,7 @@ GET  /api/auth/me
 
 
 
-\### Tickets
+### Tickets
 
 
 
@@ -422,7 +422,7 @@ PATCH /api/tickets/{ticketId}/assign/{agentId}
 
 
 
-\### Authorization
+### Authorization
 
 
 
@@ -444,7 +444,7 @@ PATCH /api/tickets/{ticketId}/assign/{agentId}
 
 
 
-\## Database
+## Database
 
 
 
@@ -488,11 +488,11 @@ dotnet ef database update `
 
 
 
-\## Getting Started
+## Getting Started
 
 
 
-\### Requirements
+### Requirements
 
 
 
@@ -500,13 +500,13 @@ Install:
 
 
 
-\- .NET 10 SDK
+- .NET 10 SDK
 
-\- MySQL 8
+- MySQL 8
 
-\- Git
+- Git
 
-\- EF Core CLI tools
+- EF Core CLI tools
 
 
 
@@ -552,7 +552,7 @@ COLLATE utf8mb4\_unicode\_ci;
 
 
 
-\### Local Configuration
+### Local Configuration
 
 
 
@@ -612,7 +612,7 @@ Never commit real passwords or production secrets to Git.
 
 
 
-\### Apply Migrations
+### Apply Migrations
 
 
 
@@ -628,7 +628,7 @@ dotnet ef database update `
 
 
 
-\### Build
+### Build
 
 
 
@@ -640,7 +640,7 @@ dotnet build SupportFlow.slnx
 
 
 
-\### Run
+### Run
 
 
 
@@ -652,7 +652,7 @@ dotnet run --project backend/SupportFlow.Api
 
 
 
-\## Example Ticket
+## Example Ticket
 
 
 
@@ -702,7 +702,7 @@ Example response:
 
 
 
-\## Roadmap
+## Roadmap
 
 
 
@@ -714,37 +714,37 @@ Planned features include:
 
 
 
-\- Assigned tickets queue for agents
+- Assigned tickets queue for agents
 
-\- Ticket comments
+- Ticket comments
 
-\- Internal agent notes
+- Internal agent notes
 
-\- Ticket search and filtering
+- Ticket search and filtering
 
-\- Pagination and sorting
+- Pagination and sorting
 
-\- Status transition rules
+- Status transition rules
 
-\- Improved validation
+- Improved validation
 
-\- Global exception handling
+- Global exception handling
 
-\- Refresh tokens
+- Refresh tokens
 
-\- Admin user management
+- Admin user management
 
-\- Automated tests
+- Automated tests
 
-\- Docker support
+- Docker support
 
-\- GitHub Actions CI/CD
+- GitHub Actions CI/CD
 
-\- React frontend
+- React frontend
 
 
 
-\### AI Support Features
+### AI Support Features
 
 
 
@@ -752,15 +752,15 @@ The long-term goal is to add AI-assisted support functionality such as:
 
 
 
-\- Automatic ticket categorization
+- Automatic ticket categorization
 
-\- Automatic priority detection
+- Automatic priority detection
 
-\- Ticket summarization
+- Ticket summarization
 
-\- Sentiment analysis
+- Sentiment analysis
 
-\- Suggested agent responses
+- Suggested agent responses
 
 
 
@@ -768,7 +768,7 @@ These features are planned and are not yet part of the current implementation.
 
 
 
-\## Project Goals
+## Project Goals
 
 
 
@@ -776,33 +776,33 @@ SupportFlow is being developed as a portfolio project focused on practical backe
 
 
 
-\- REST API design
+- REST API design
 
-\- Authentication
+- Authentication
 
-\- Authorization
+- Authorization
 
-\- Relational databases
+- Relational databases
 
-\- Entity Framework Core
+- Entity Framework Core
 
-\- Clean Architecture
+- Clean Architecture
 
-\- Security
+- Security
 
-\- Testing
+- Testing
 
-\- Maintainable application structure
+- Maintainable application structure
 
-\- AI integration
-
-
-
-\## Author
+- AI integration
 
 
 
-\*\*Orozobek Israilov\*\*
+## Author
+
+
+
+**Orozobek Israilov**
 
 
 
@@ -811,4 +811,5 @@ Junior Software Developer
 
 
 GitHub: LazyOroz
+
 
