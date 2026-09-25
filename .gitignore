@@ -1,0 +1,31 @@
+# .NET
+bin/
+obj/
+.vs/
+
+# Visual Studio / Rider
+*.user
+*.suo
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Secrets
+.env
+.env.*
+appsettings.Development.json
+
+# Frontend
+node_modules/
+dist/
+build/
+
+# Test results
+TestResults/
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db

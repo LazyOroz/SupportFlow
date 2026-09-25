@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/backend/">
+    <Project Path="backend/SupportFlow.Api/SupportFlow.Api.csproj" />
+    <Project Path="backend/SupportFlow.Application/SupportFlow.Application.csproj" />
+    <Project Path="backend/SupportFlow.Domain/SupportFlow.Domain.csproj" />
+    <Project Path="backend/SupportFlow.Infrastructure/SupportFlow.Infrastructure.csproj" />
+    <Project Path="backend/SupportFlow.Tests/SupportFlow.Tests.csproj" />
+  </Folder>
+</Solution>
