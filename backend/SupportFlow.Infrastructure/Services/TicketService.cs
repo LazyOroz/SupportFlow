@@ -64,6 +64,18 @@ public class TicketService : ITicketService
             .ToList();
     }
 
+    public async Task<IReadOnlyList<TicketResponse>> GetAllTicketsAsync()
+    {
+        var tickets = await _dbContext.Tickets
+            .AsNoTracking()
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
+
+        return tickets
+            .Select(MapToResponse)
+            .ToList();
+    }
+
     public async Task<IReadOnlyList<TicketResponse>> GetAssignedTicketsAsync(
         Guid agentId)
     {

@@ -84,6 +84,16 @@ public class TicketsController : ControllerBase
         return Ok(tickets);
     }
 
+    // GET: /api/tickets/all
+    [Authorize(Roles = "Admin")]
+    [HttpGet("all")]
+    public async Task<ActionResult<IReadOnlyList<TicketResponse>>> GetAllTickets()
+    {
+        var tickets = await _ticketService.GetAllTicketsAsync();
+
+        return Ok(tickets);
+    }
+
     // GET: /api/tickets/{id}
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<TicketResponse>> GetById(
