@@ -7,6 +7,7 @@ using SupportFlow.Infrastructure.Authentication;
 using SupportFlow.Infrastructure.Persistence;
 using SupportFlow.Infrastructure.Services;
 using SupportFlow.Application.Tickets.Interfaces;
+using SupportFlow.Application.Comments.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ builder.Services.AddDbContext<SupportFlowDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 // JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"]
