@@ -36,37 +36,13 @@ public class CommentsController : ControllerBase
             });
         }
 
-        try
-        {
-            var comment = await _commentService.CreateAsync(
-                ticketId,
-                userId.Value,
-                userRole.Value,
-                request);
+        var comment = await _commentService.CreateAsync(
+            ticketId,
+            userId.Value,
+            userRole.Value,
+            request);
 
-            return Ok(comment);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new
-            {
-                message = ex.Message
-            });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new
-            {
-                message = ex.Message
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new
-            {
-                message = ex.Message
-            });
-        }
+        return Ok(comment);
     }
 
     // GET: /api/tickets/{ticketId}/comments
@@ -85,29 +61,12 @@ public class CommentsController : ControllerBase
             });
         }
 
-        try
-        {
-            var comments = await _commentService.GetByTicketAsync(
-                ticketId,
-                userId.Value,
-                userRole.Value);
+        var comments = await _commentService.GetByTicketAsync(
+            ticketId,
+            userId.Value,
+            userRole.Value);
 
-            return Ok(comments);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new
-            {
-                message = ex.Message
-            });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new
-            {
-                message = ex.Message
-            });
-        }
+        return Ok(comments);
     }
 
     private Guid? GetCurrentUserId()

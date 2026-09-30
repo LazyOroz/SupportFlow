@@ -8,6 +8,7 @@ using SupportFlow.Infrastructure.Persistence;
 using SupportFlow.Infrastructure.Services;
 using SupportFlow.Application.Tickets.Interfaces;
 using SupportFlow.Application.Comments.Interfaces;
+using SupportFlow.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +75,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 

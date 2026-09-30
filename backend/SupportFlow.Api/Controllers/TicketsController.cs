@@ -111,32 +111,20 @@ public class TicketsController : ControllerBase
             });
         }
 
-        try
-        {
-            var ticket = await _ticketService.GetByIdAsync(
-                id,
-                userId.Value,
-                userRole.Value);
+        var ticket = await _ticketService.GetByIdAsync(
+            id,
+            userId.Value,
+            userRole.Value);
 
-            if (ticket is null)
+        if (ticket is null)
+        {
+            return NotFound(new
             {
-                return NotFound(new
-                {
-                    message = "Ticket not found."
-                });
-            }
+                message = "Ticket not found."
+            });
+        }
 
-            return Ok(ticket);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return StatusCode(
-                StatusCodes.Status403Forbidden,
-                new
-                {
-                    message = ex.Message
-                });
-        }
+        return Ok(ticket);
     }
 
     // PATCH: /api/tickets/{id}/status
@@ -157,33 +145,21 @@ public class TicketsController : ControllerBase
             });
         }
 
-        try
-        {
-            var ticket = await _ticketService.UpdateStatusAsync(
-                id,
-                request.Status,
-                userId.Value,
-                userRole.Value);
+        var ticket = await _ticketService.UpdateStatusAsync(
+            id,
+            request.Status,
+            userId.Value,
+            userRole.Value);
 
-            if (ticket is null)
+        if (ticket is null)
+        {
+            return NotFound(new
             {
-                return NotFound(new
-                {
-                    message = "Ticket not found."
-                });
-            }
+                message = "Ticket not found."
+            });
+        }
 
-            return Ok(ticket);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return StatusCode(
-                StatusCodes.Status403Forbidden,
-                new
-                {
-                    message = ex.Message
-                });
-        }
+        return Ok(ticket);
     }
 
     // PATCH: /api/tickets/{ticketId}/assign/{agentId}
@@ -193,29 +169,19 @@ public class TicketsController : ControllerBase
         Guid ticketId,
         Guid agentId)
     {
-        try
-        {
-            var ticket = await _ticketService.AssignToAgentAsync(
-                ticketId,
-                agentId);
+        var ticket = await _ticketService.AssignToAgentAsync(
+            ticketId,
+            agentId);
 
-            if (ticket is null)
-            {
-                return NotFound(new
-                {
-                    message = "Ticket not found."
-                });
-            }
-
-            return Ok(ticket);
-        }
-        catch (InvalidOperationException ex)
+        if (ticket is null)
         {
-            return BadRequest(new
+            return NotFound(new
             {
-                message = ex.Message
+                message = "Ticket not found."
             });
         }
+
+        return Ok(ticket);
     }
 
     private Guid? GetCurrentUserId()
