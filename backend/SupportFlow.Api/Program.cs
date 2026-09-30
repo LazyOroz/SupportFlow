@@ -24,6 +24,18 @@ builder.Services
 // OpenAPI
 builder.Services.AddOpenApi();
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // Database
 builder.Services.AddDbContext<SupportFlowDbContext>(options =>
     options.UseMySQL(
@@ -85,9 +97,13 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// Global exception handler
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseHttpsRedirection();
+
+// Allow React frontend to call the API
+app.UseCors("Frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
