@@ -12,7 +12,8 @@ public interface ITicketService
     Task<IReadOnlyList<TicketResponse>> GetMyTicketsAsync(
         Guid userId);
 
-    Task<IReadOnlyList<TicketResponse>> GetAllTicketsAsync();
+    Task<PagedResult<TicketResponse>> GetAllTicketsAsync(
+        TicketQueryRequest query);
 
     Task<IReadOnlyList<TicketResponse>> GetAssignedTicketsAsync(
         Guid agentId);

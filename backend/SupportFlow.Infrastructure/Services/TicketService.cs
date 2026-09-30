@@ -64,16 +64,89 @@ public class TicketService : ITicketService
             .ToList();
     }
 
-    public async Task<IReadOnlyList<TicketResponse>> GetAllTicketsAsync()
+    public async Task<PagedResult<TicketResponse>> GetAllTicketsAsync(
+        TicketQueryRequest query)
     {
-        var tickets = await _dbContext.Tickets
+        var ticketsQuery = _dbContext.Tickets
             .AsNoTracking()
+            .AsQueryable();
+
+        // Search by ticket number, title or description
+        if (!string.IsNullOrWhiteSpace(query.Search))
+        {
+            var search = query.Search.Trim();
+
+            ticketsQuery = ticketsQuery.Where(x =>
+                x.TicketNumber.Contains(search) ||
+                x.Title.Contains(search) ||
+                x.Description.Contains(search));
+        }
+
+        // Filter by status
+        if (query.Status.HasValue)
+        {
+            ticketsQuery = ticketsQuery.Where(x =>
+                x.Status == query.Status.Value);
+        }
+
+        // Filter by priority
+        if (query.Priority.HasValue)
+        {
+            ticketsQuery = ticketsQuery.Where(x =>
+                x.Priority == query.Priority.Value);
+        }
+
+        // Filter by category
+        if (query.Category.HasValue)
+        {
+            ticketsQuery = ticketsQuery.Where(x =>
+                x.Category == query.Category.Value);
+        }
+
+        // Filter by assigned agent
+        if (query.AssignedToId.HasValue)
+        {
+            ticketsQuery = ticketsQuery.Where(x =>
+                x.AssignedToId == query.AssignedToId.Value);
+        }
+
+        // Protect pagination from invalid values
+        var page = query.Page < 1
+            ? 1
+            : query.Page;
+
+        var pageSize = query.PageSize switch
+        {
+            < 1 => 20,
+            > 100 => 100,
+            _ => query.PageSize
+        };
+
+        // Count BEFORE Skip/Take
+        var totalCount = await ticketsQuery.CountAsync();
+
+        var totalPages = totalCount == 0
+            ? 0
+            : (int)Math.Ceiling(
+                totalCount / (double)pageSize);
+
+        var tickets = await ticketsQuery
             .OrderByDescending(x => x.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
 
-        return tickets
-            .Select(MapToResponse)
-            .ToList();
+        return new PagedResult<TicketResponse>
+        {
+            Items = tickets
+                .Select(MapToResponse)
+                .ToList(),
+
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages
+        };
     }
 
     public async Task<IReadOnlyList<TicketResponse>> GetAssignedTicketsAsync(

@@ -87,11 +87,12 @@ public class TicketsController : ControllerBase
     // GET: /api/tickets/all
     [Authorize(Roles = "Admin")]
     [HttpGet("all")]
-    public async Task<ActionResult<IReadOnlyList<TicketResponse>>> GetAllTickets()
+    public async Task<ActionResult<PagedResult<TicketResponse>>> GetAllTickets(
+        [FromQuery] TicketQueryRequest query)
     {
-        var tickets = await _ticketService.GetAllTicketsAsync();
+        var result = await _ticketService.GetAllTicketsAsync(query);
 
-        return Ok(tickets);
+        return Ok(result);
     }
 
     // GET: /api/tickets/{id}
