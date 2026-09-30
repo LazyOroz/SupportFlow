@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SupportFlow.Application.Tickets.DTOs;
 using SupportFlow.Application.Tickets.Interfaces;
+using SupportFlow.Domain.Enums;
 
 namespace SupportFlow.Api.Controllers;
 
@@ -120,19 +121,44 @@ public class TicketsController : ControllerBase
         Guid id,
         UpdateTicketStatusRequest request)
     {
-        var ticket = await _ticketService.UpdateStatusAsync(
-            id,
-            request.Status);
+        var userId = GetCurrentUserId();
+        var userRole = GetCurrentUserRole();
 
-        if (ticket is null)
+        if (userId is null || userRole is null)
         {
-            return NotFound(new
+            return Unauthorized(new
             {
-                message = "Ticket not found."
+                message = "Invalid user information."
             });
         }
 
-        return Ok(ticket);
+        try
+        {
+            var ticket = await _ticketService.UpdateStatusAsync(
+                id,
+                request.Status,
+                userId.Value,
+                userRole.Value);
+
+            if (ticket is null)
+            {
+                return NotFound(new
+                {
+                    message = "Ticket not found."
+                });
+            }
+
+            return Ok(ticket);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                new
+                {
+                    message = ex.Message
+                });
+        }
     }
 
     // PATCH: /api/tickets/{ticketId}/assign/{agentId}
@@ -178,5 +204,21 @@ public class TicketsController : ControllerBase
         }
 
         return userId;
+    }
+
+    private UserRole? GetCurrentUserRole()
+    {
+        var roleValue = User.FindFirstValue(
+            ClaimTypes.Role);
+
+        if (!Enum.TryParse<UserRole>(
+                roleValue,
+                ignoreCase: true,
+                out var role))
+        {
+            return null;
+        }
+
+        return role;
     }
 }

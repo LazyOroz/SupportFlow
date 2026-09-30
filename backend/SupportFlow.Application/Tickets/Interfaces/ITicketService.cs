@@ -21,7 +21,9 @@ public interface ITicketService
 
     Task<TicketResponse?> UpdateStatusAsync(
         Guid ticketId,
-        TicketStatus status);
+        TicketStatus status,
+        Guid userId,
+        UserRole userRole);
 
     Task<TicketResponse?> AssignToAgentAsync(
         Guid ticketId,

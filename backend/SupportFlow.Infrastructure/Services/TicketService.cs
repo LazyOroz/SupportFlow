@@ -45,7 +45,6 @@ public class TicketService : ITicketService
         };
 
         _dbContext.Tickets.Add(ticket);
-
         await _dbContext.SaveChangesAsync();
 
         return MapToResponse(ticket);
@@ -99,7 +98,9 @@ public class TicketService : ITicketService
 
     public async Task<TicketResponse?> UpdateStatusAsync(
         Guid ticketId,
-        TicketStatus status)
+        TicketStatus status,
+        Guid userId,
+        UserRole userRole)
     {
         var ticket = await _dbContext.Tickets
             .FirstOrDefaultAsync(x => x.Id == ticketId);
@@ -109,16 +110,29 @@ public class TicketService : ITicketService
             return null;
         }
 
+        // Admin can update any ticket.
+        // Agent can update only a ticket assigned to them.
+        if (userRole == UserRole.Agent &&
+            ticket.AssignedToId != userId)
+        {
+            throw new UnauthorizedAccessException(
+                "You can only update tickets assigned to you.");
+        }
+
+        if (userRole != UserRole.Agent &&
+            userRole != UserRole.Admin)
+        {
+            throw new UnauthorizedAccessException(
+                "You do not have permission to update ticket status.");
+        }
+
         ticket.Status = status;
         ticket.UpdatedAt = DateTime.UtcNow;
 
-        if (status == TicketStatus.Resolved)
+        if (status == TicketStatus.Resolved &&
+            ticket.ResolvedAt is null)
         {
             ticket.ResolvedAt = DateTime.UtcNow;
-        }
-        else
-        {
-            ticket.ResolvedAt = null;
         }
 
         await _dbContext.SaveChangesAsync();
@@ -156,20 +170,6 @@ public class TicketService : ITicketService
         await _dbContext.SaveChangesAsync();
 
         return MapToResponse(ticket);
-    }
-
-    public async Task<IReadOnlyList<TicketResponse>> GetAssignedToMeAsync(
-        Guid agentId)
-    {
-        var tickets = await _dbContext.Tickets
-            .AsNoTracking()
-            .Where(x => x.AssignedToId == agentId)
-            .OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt)
-            .ToListAsync();
-
-        return tickets
-            .Select(MapToResponse)
-            .ToList();
     }
 
     private static TicketResponse MapToResponse(
