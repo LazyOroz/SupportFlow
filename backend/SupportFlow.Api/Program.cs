@@ -70,6 +70,15 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// Apply EF Core migrations automatically
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider
+        .GetRequiredService<SupportFlowDbContext>();
+
+    dbContext.Database.Migrate();
+}
+
 // OpenAPI only in development
 if (app.Environment.IsDevelopment())
 {
