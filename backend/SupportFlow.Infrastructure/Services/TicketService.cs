@@ -230,6 +230,30 @@ public class TicketService : ITicketService
                 "You do not have permission to update ticket status.");
         }
 
+        // Check whether the status transition is allowed.
+        var isValidTransition = ticket.Status switch
+        {
+            TicketStatus.Open =>
+                status == TicketStatus.InProgress,
+
+            TicketStatus.InProgress =>
+                status == TicketStatus.Resolved,
+
+            TicketStatus.Resolved =>
+                status == TicketStatus.Closed,
+
+            TicketStatus.Closed =>
+                false,
+
+            _ => false
+        };
+
+        if (!isValidTransition)
+        {
+            throw new InvalidOperationException(
+                $"Cannot change ticket status from {ticket.Status} to {status}.");
+        }
+
         ticket.Status = status;
         ticket.UpdatedAt = DateTime.UtcNow;
 
