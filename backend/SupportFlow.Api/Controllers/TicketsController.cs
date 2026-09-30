@@ -62,6 +62,27 @@ public class TicketsController : ControllerBase
         return Ok(tickets);
     }
 
+    // GET: /api/tickets/assigned-to-me
+    [Authorize(Roles = "Agent")]
+    [HttpGet("assigned-to-me")]
+    public async Task<ActionResult<IReadOnlyList<TicketResponse>>> GetAssignedToMe()
+    {
+        var userId = GetCurrentUserId();
+
+        if (userId is null)
+        {
+            return Unauthorized(new
+            {
+                message = "Invalid user identifier."
+            });
+        }
+
+        var tickets = await _ticketService.GetAssignedTicketsAsync(
+            userId.Value);
+
+        return Ok(tickets);
+    }
+
     // GET: /api/tickets/{id}
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<TicketResponse>> GetById(

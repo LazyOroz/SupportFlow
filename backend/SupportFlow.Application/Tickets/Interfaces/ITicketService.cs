@@ -12,6 +12,9 @@ public interface ITicketService
     Task<IReadOnlyList<TicketResponse>> GetMyTicketsAsync(
         Guid userId);
 
+    Task<IReadOnlyList<TicketResponse>> GetAssignedTicketsAsync(
+        Guid agentId);
+
     Task<TicketResponse?> GetByIdAsync(
         Guid ticketId,
         Guid userId);
@@ -22,8 +25,5 @@ public interface ITicketService
 
     Task<TicketResponse?> AssignToAgentAsync(
         Guid ticketId,
-        Guid agentId);
-
-    Task<IReadOnlyList<TicketResponse>> GetAssignedToMeAsync(
         Guid agentId);
 }

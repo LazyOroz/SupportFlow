@@ -65,6 +65,20 @@ public class TicketService : ITicketService
             .ToList();
     }
 
+    public async Task<IReadOnlyList<TicketResponse>> GetAssignedTicketsAsync(
+        Guid agentId)
+    {
+        var tickets = await _dbContext.Tickets
+            .AsNoTracking()
+            .Where(x => x.AssignedToId == agentId)
+            .OrderByDescending(x => x.UpdatedAt ?? x.CreatedAt)
+            .ToListAsync();
+
+        return tickets
+            .Select(MapToResponse)
+            .ToList();
+    }
+
     public async Task<TicketResponse?> GetByIdAsync(
         Guid ticketId,
         Guid userId)
