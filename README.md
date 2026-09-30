@@ -1,815 +1,597 @@
 # SupportFlow
 
+SupportFlow is a backend support ticket management system built with ASP.NET Core, MySQL, Entity Framework Core, Docker, and Clean Architecture.
 
+The project provides JWT authentication, role-based authorization, ticket management, agent assignment, comments and internal notes, filtering, pagination, automated tests, Docker support, and CI.
 
-SupportFlow is a backend support ticket management system built with ASP.NET Core, MySQL, Entity Framework Core, and Clean Architecture.
+The long-term goal is to extend SupportFlow with a React frontend and AI-assisted customer support features.
 
-
-
-The project provides authentication, role-based authorization, ticket management, agent assignment, and a foundation for future AI-powered support features.
-
-
+---
 
 ## Features
 
-
-
 ### Authentication
 
-
-
 - User registration
-
 - User login
-
 - JWT authentication
-
-- Password hashing with BCrypt
-
+- BCrypt password hashing
 - Authenticated user profile endpoint
-
 - Active/inactive user support
-
-
 
 ### Role-Based Authorization
 
+SupportFlow supports three roles:
 
-
-SupportFlow currently supports three roles:
-
-
-
-- **Customer** — creates and views their own tickets
-
-- **Agent** — handles support tickets and updates ticket statuses
-
-- **Admin** — manages ticket assignment and administrative operations
-
-
+- **Customer** - creates and manages their support requests
+- **Agent** - handles tickets assigned to them
+- **Admin** - manages tickets and agent assignments
 
 Authorization is enforced using JWT claims and ASP.NET Core role-based authorization.
 
-
-
 ### Ticket Management
 
-
-
-Tickets contain:
-
-
+Each ticket contains:
 
 - Unique ticket number
-
 - Title
-
 - Description
-
 - Status
-
 - Priority
-
 - Category
-
 - Creator
-
 - Assigned agent
-
 - Creation timestamp
-
 - Update timestamp
-
 - Resolution timestamp
 
-
-
-Current ticket statuses:
-
-
+Ticket statuses:
 
 - `Open`
-
 - `InProgress`
-
 - `Resolved`
-
 - `Closed`
 
+Supported workflow:
 
+```text
+Open -> InProgress -> Resolved -> Closed
+```
+
+Invalid status transitions are rejected by the backend.
 
 Priorities:
 
-
-
 - `Low`
-
 - `Medium`
-
 - `High`
-
 - `Critical`
-
-
 
 Categories:
 
-
-
 - `General`
-
 - `Technical`
-
 - `Billing`
-
 - `Account`
-
 - `FeatureRequest`
-
 - `Bug`
-
 - `Other`
-
-
 
 ### Ticket Assignment
 
-
-
 Admins can assign tickets to active users with the `Agent` role.
 
+The backend validates that the selected user exists, is active, and has the correct role.
 
+### Comments and Internal Notes
 
-The backend validates that the selected user exists, is active, and has the correct role before assigning the ticket.
+Tickets support conversations between users and support staff.
 
+- Customers can create and view public comments on their own tickets.
+- Assigned agents can create public comments and internal notes.
+- Admins can access ticket comments.
+- Internal notes are hidden from customers.
+- Agents can access only tickets assigned to them.
 
+### Search, Filtering and Pagination
+
+Administrative ticket queries support:
+
+- Text search
+- Status filtering
+- Priority filtering
+- Category filtering
+- Assigned agent filtering
+- Pagination
+
+Page size is limited by the backend to prevent excessively large queries.
+
+### Error Handling
+
+SupportFlow uses global exception middleware to provide consistent API error responses.
+
+Handled cases include:
+
+- `400 Bad Request`
+- `403 Forbidden`
+- `404 Not Found`
+- `500 Internal Server Error`
+
+---
 
 ## Tech Stack
 
-
-
 ### Backend
 
-
-
 - C#
-
 - .NET 10
-
 - ASP.NET Core Web API
-
 - Entity Framework Core
-
 - MySQL 8
 
-
-
-### Authentication \& Security
-
-
+### Authentication & Security
 
 - JWT Bearer Authentication
-
 - BCrypt password hashing
-
 - Role-based authorization
-
-- .NET User Secrets for local secrets
-
-
-
-### Development
-
-
-
-- Git
-
-- GitHub
-
-- PowerShell
-
-- Visual Studio
-
-- EF Core Migrations
-
-
+- .NET User Secrets for local development
+- Environment variables for Docker secrets
 
 ### Testing
 
+- xUnit
+- EF Core InMemory provider
+- 19 automated tests
 
+Current automated tests cover:
 
-- xUnit project structure
+- Authentication
+- Registration
+- Password hashing
+- Login validation
+- Disabled accounts
+- Ticket status transitions
+- Agent authorization
+- Admin ticket operations
+- Public comments
+- Internal notes
+- Comment visibility
 
+### DevOps
 
+- Docker
+- Docker Compose
+- GitHub Actions
+- Automated build and test workflow
+- EF Core automatic migrations
+
+---
 
 ## Architecture
 
-
-
 SupportFlow follows a layered Clean Architecture structure:
 
-
-
 ```text
-
 SupportFlow
-
-│
-
-├── backend
-
-│   ├── SupportFlow.Api
-
-│   │   ├── Controllers
-
-│   │   └── Program.cs
-
-│   │
-
-│   ├── SupportFlow.Application
-
-│   │   ├── Auth
-
-│   │   │   ├── DTOs
-
-│   │   │   └── Interfaces
-
-│   │   └── Tickets
-
-│   │       ├── DTOs
-
-│   │       └── Interfaces
-
-│   │
-
-│   ├── SupportFlow.Domain
-
-│   │   ├── Entities
-
-│   │   └── Enums
-
-│   │
-
-│   ├── SupportFlow.Infrastructure
-
-│   │   ├── Authentication
-
-│   │   ├── Persistence
-
-│   │   └── Services
-
-│   │
-
-│   └── SupportFlow.Tests
-
-│
-
-└── SupportFlow.slnx
-
+|
++-- backend
+|   |
+|   +-- SupportFlow.Api
+|   |   +-- Controllers
+|   |   +-- Middleware
+|   |   +-- Program.cs
+|   |
+|   +-- SupportFlow.Application
+|   |   +-- Auth
+|   |   +-- Tickets
+|   |   +-- Comments
+|   |   +-- DTOs
+|   |   +-- Interfaces
+|   |
+|   +-- SupportFlow.Domain
+|   |   +-- Entities
+|   |   +-- Enums
+|   |
+|   +-- SupportFlow.Infrastructure
+|   |   +-- Authentication
+|   |   +-- Persistence
+|   |   +-- Services
+|   |
+|   +-- SupportFlow.Tests
+|
++-- Dockerfile
++-- compose.yaml
++-- SupportFlow.slnx
 ```
-
-
 
 ### Dependency Flow
 
-
-
 ```text
-
 API
-
-&#x20;│
-
-&#x20;├── Application
-
-&#x20;│       │
-
-&#x20;│       └── Domain
-
-&#x20;│
-
-&#x20;└── Infrastructure
-
-&#x20;        │
-
-&#x20;        ├── Application
-
-&#x20;        └── Domain
-
+ |
+ +--> Application
+ |       |
+ |       +--> Domain
+ |
+ +--> Infrastructure
+         |
+         +--> Application
+         +--> Domain
 ```
 
+The **Domain** layer contains core entities and enums.
 
+The **Application** layer contains DTOs and service contracts.
 
-The Domain layer contains the core entities and enums.
+The **Infrastructure** layer implements persistence, authentication, and application services.
 
+The **API** layer exposes the application through REST endpoints and acts as the composition root.
 
-
-The Application layer defines DTOs and service contracts.
-
-
-
-The Infrastructure layer implements persistence, authentication, and application services.
-
-
-
-The API layer exposes the system through REST endpoints.
-
-
+---
 
 ## Domain Model
 
-
-
-The current domain contains three main entities:
-
-
-
 ### User
-
-
 
 Represents a SupportFlow user.
 
-
-
 A user can:
 
-
-
 - Create tickets
-
 - Be assigned tickets as an agent
-
 - Write comments
-
 - Have a `Customer`, `Agent`, or `Admin` role
-
-
 
 ### Ticket
 
-
-
 Represents a customer support request.
-
-
 
 Each ticket belongs to its creator and can optionally be assigned to an agent.
 
-
-
 ### Comment
-
-
 
 Represents communication related to a ticket.
 
+Comments can be public or internal using the `IsInternal` property.
 
-
-The model also supports internal comments through the `IsInternal` property.
-
-
+---
 
 ## API
 
-
-
-Base development URL:
-
-
+### Docker Development URL
 
 ```text
-
-http://localhost:5263
-
+http://localhost:8080
 ```
-
-
 
 ### Authentication
 
-
-
 ```http
-
 POST /api/auth/register
-
 POST /api/auth/login
-
 GET  /api/auth/me
-
 ```
-
-
 
 ### Tickets
 
-
-
 ```http
-
 POST  /api/tickets
-
 GET   /api/tickets
-
+GET   /api/tickets/assigned-to-me
+GET   /api/tickets/all
 GET   /api/tickets/{id}
 
 PATCH /api/tickets/{id}/status
-
 PATCH /api/tickets/{ticketId}/assign/{agentId}
-
 ```
 
+### Comments
 
+```http
+POST /api/tickets/{ticketId}/comments
+GET  /api/tickets/{ticketId}/comments
+```
 
-### Authorization
+### OpenAPI
 
+When running in the Development environment:
 
+```text
+http://localhost:8080/openapi/v1.json
+```
 
-| Endpoint | Customer | Agent | Admin |
-
-|---|:---:|:---:|:---:|
-
-| Register / Login | Yes | Yes | Yes |
-
-| Get current user | Yes | Yes | Yes |
-
-| Create ticket | Yes | Yes | Yes |
-
-| View own tickets | Yes | Yes | Yes |
-
-| Update ticket status | No | Yes | Yes |
-
-| Assign ticket to agent | No | No | Yes |
-
-
+---
 
 ## Database
 
-
-
-SupportFlow uses MySQL with Entity Framework Core.
-
-
+SupportFlow uses MySQL 8 with Entity Framework Core.
 
 Main tables:
 
-
-
 ```text
-
-users
-
-tickets
-
-comments
-
+Users
+Tickets
+Comments
+__EFMigrationsHistory
 ```
 
+Database schema changes are managed using EF Core migrations.
 
+When SupportFlow starts, pending migrations are automatically applied:
 
-Database schema changes are managed through EF Core migrations.
-
-
-
-Create/update the database with:
-
-
-
-```powershell
-
-dotnet ef database update `
-
-&#x20;   --project backend/SupportFlow.Infrastructure `
-
-&#x20;   --startup-project backend/SupportFlow.Api
-
+```csharp
+dbContext.Database.Migrate();
 ```
 
+---
 
+# Running with Docker
 
-## Getting Started
+Docker is the easiest way to run SupportFlow.
 
-
-
-### Requirements
-
-
+## Requirements
 
 Install:
 
-
-
-- .NET 10 SDK
-
-- MySQL 8
-
 - Git
-
-- EF Core CLI tools
-
-
+- Docker Desktop
 
 Clone the repository:
 
-
-
 ```bash
-
 git clone https://github.com/LazyOroz/SupportFlow.git
-
 cd SupportFlow
-
 ```
 
+Create a `.env` file in the project root:
 
+```env
+MYSQL_ROOT_PASSWORD=YOUR_ROOT_PASSWORD
+MYSQL_PASSWORD=YOUR_DATABASE_PASSWORD
+JWT_KEY=YOUR_LONG_RANDOM_JWT_SECRET
+```
+
+Do not commit the `.env` file.
+
+Start the application:
+
+```bash
+docker compose up --build
+```
+
+Docker Compose starts:
+
+```text
+supportflow-api
+        |
+        | EF Core
+        v
+supportflow-mysql
+        |
+        v
+supportflow_db
+```
+
+The API becomes available at:
+
+```text
+http://localhost:8080
+```
+
+MySQL is exposed to the host on:
+
+```text
+localhost:3307
+```
+
+Inside the Docker network, the API connects to MySQL using port `3306`.
+
+### Stop the application
+
+```bash
+docker compose down
+```
+
+Database data is stored in a Docker volume and survives normal container restarts.
+
+---
+
+# Running without Docker
+
+## Requirements
+
+Install:
+
+- .NET 10 SDK
+- MySQL 8
+- Git
+- EF Core CLI tools
 
 Restore dependencies:
 
-
-
-```powershell
-
+```bash
 dotnet restore SupportFlow.slnx
-
 ```
 
+Configure sensitive values using .NET User Secrets.
 
-
-Create a MySQL database:
-
-
-
-```sql
-
-CREATE DATABASE supportflow\_db
-
-CHARACTER SET utf8mb4
-
-COLLATE utf8mb4\_unicode\_ci;
-
-```
-
-
-
-### Local Configuration
-
-
-
-Sensitive configuration is not stored in the repository.
-
-
-
-Initialize .NET User Secrets:
-
-
+Example database connection:
 
 ```powershell
-
-dotnet user-secrets init --project backend/SupportFlow.Api
-
-```
-
-
-
-Configure the database connection:
-
-
-
-```powershell
-
 dotnet user-secrets set `
-
-&#x20;   "ConnectionStrings:DefaultConnection" `
-
-&#x20;   "Server=localhost;Port=3306;Database=supportflow\_db;User=YOUR\_USER;Password=YOUR\_PASSWORD;" `
-
-&#x20;   --project backend/SupportFlow.Api
-
+    "ConnectionStrings:DefaultConnection" `
+    "Server=localhost;Port=3306;Database=supportflow_db;User=YOUR_USER;Password=YOUR_PASSWORD;" `
+    --project backend/SupportFlow.Api
 ```
 
-
-
-Configure a JWT signing key:
-
-
+Configure the JWT signing key:
 
 ```powershell
-
 dotnet user-secrets set `
-
-&#x20;   "Jwt:Key" `
-
-&#x20;   "YOUR\_DEVELOPMENT\_JWT\_SECRET" `
-
-&#x20;   --project backend/SupportFlow.Api
-
+    "Jwt:Key" `
+    "YOUR_DEVELOPMENT_JWT_SECRET" `
+    --project backend/SupportFlow.Api
 ```
 
+Build:
 
-
-Never commit real passwords or production secrets to Git.
-
-
-
-### Apply Migrations
-
-
-
-```powershell
-
-dotnet ef database update `
-
-&#x20;   --project backend/SupportFlow.Infrastructure `
-
-&#x20;   --startup-project backend/SupportFlow.Api
-
-```
-
-
-
-### Build
-
-
-
-```powershell
-
+```bash
 dotnet build SupportFlow.slnx
-
 ```
 
+Run:
 
-
-### Run
-
-
-
-```powershell
-
+```bash
 dotnet run --project backend/SupportFlow.Api
-
 ```
 
+---
 
+## Testing
+
+Run all automated tests:
+
+```bash
+dotnet test SupportFlow.slnx
+```
+
+Current test suite:
+
+```text
+Total:   19
+Passed:  19
+Failed:  0
+```
+
+Tests cover authentication, ticket workflows, permissions, comments, and internal notes.
+
+---
+
+## Continuous Integration
+
+SupportFlow uses GitHub Actions.
+
+On every push or pull request to `main`, CI automatically:
+
+```text
+Checkout repository
+        |
+        v
+Setup .NET 10
+        |
+        v
+Restore dependencies
+        |
+        v
+Build Release
+        |
+        v
+Run automated tests
+```
+
+This verifies that the application builds successfully and that all automated tests pass.
+
+---
 
 ## Example Ticket
 
-
-
-Example request:
-
-
+Request:
 
 ```json
-
 {
-
-&#x20; "title": "Cannot log in to my account",
-
-&#x20; "description": "I cannot access my account after changing my password.",
-
-&#x20; "priority": "High",
-
-&#x20; "category": "Account"
-
+  "title": "Cannot log in to my account",
+  "description": "I cannot access my account after changing my password.",
+  "priority": "High",
+  "category": "Account"
 }
-
 ```
-
-
 
 Example response:
 
-
-
 ```json
-
 {
-
-&#x20; "ticketNumber": "SF-20260925-XXXXXX",
-
-&#x20; "title": "Cannot log in to my account",
-
-&#x20; "status": "Open",
-
-&#x20; "priority": "High",
-
-&#x20; "category": "Account"
-
+  "ticketNumber": "SF-20260925-XXXXXX",
+  "title": "Cannot log in to my account",
+  "status": "Open",
+  "priority": "High",
+  "category": "Account"
 }
-
 ```
 
-
+---
 
 ## Roadmap
 
+### Completed
 
+- [x] Clean Architecture backend
+- [x] MySQL database
+- [x] EF Core migrations
+- [x] JWT authentication
+- [x] BCrypt password hashing
+- [x] Role-based authorization
+- [x] Ticket creation and management
+- [x] Agent ticket assignment
+- [x] Assigned ticket queue
+- [x] Ticket comments
+- [x] Internal agent notes
+- [x] Ticket search and filtering
+- [x] Pagination
+- [x] Status transition rules
+- [x] Request validation
+- [x] Global exception handling
+- [x] Automated tests
+- [x] GitHub Actions CI
+- [x] Docker support
+- [x] Docker Compose with MySQL
+- [x] Automatic database migrations
 
-SupportFlow is under active development.
+### Planned
 
+- [ ] Refresh tokens
+- [ ] Admin user management
+- [ ] Integration tests
+- [ ] React frontend
+- [ ] AI-assisted support features
 
+---
 
-Planned features include:
+## Planned AI Features
 
-
-
-- Assigned tickets queue for agents
-
-- Ticket comments
-
-- Internal agent notes
-
-- Ticket search and filtering
-
-- Pagination and sorting
-
-- Status transition rules
-
-- Improved validation
-
-- Global exception handling
-
-- Refresh tokens
-
-- Admin user management
-
-- Automated tests
-
-- Docker support
-
-- GitHub Actions CI/CD
-
-- React frontend
-
-
-
-### AI Support Features
-
-
-
-The long-term goal is to add AI-assisted support functionality such as:
-
-
+Future AI functionality may include:
 
 - Automatic ticket categorization
-
 - Automatic priority detection
-
 - Ticket summarization
-
 - Sentiment analysis
-
 - Suggested agent responses
 
+These features are planned and are not part of the current implementation.
 
-
-These features are planned and are not yet part of the current implementation.
-
-
+---
 
 ## Project Goals
 
-
-
-SupportFlow is being developed as a portfolio project focused on practical backend engineering concepts:
-
-
+SupportFlow is a portfolio project focused on practical backend engineering concepts:
 
 - REST API design
-
-- Authentication
-
-- Authorization
-
-- Relational databases
-
+- Authentication and authorization
+- Relational database design
 - Entity Framework Core
-
 - Clean Architecture
-
 - Security
-
-- Testing
-
+- Automated testing
+- Docker
+- CI
 - Maintainable application structure
+- Future AI integration
 
-- AI integration
-
-
+---
 
 ## Author
 
-
-
 **Orozobek Israilov**
-
-
 
 Junior Software Developer
 
-
-
-GitHub: LazyOroz
-
-
+GitHub: **LazyOroz**
