@@ -165,17 +165,36 @@ public class TicketService : ITicketService
 
     public async Task<TicketResponse?> GetByIdAsync(
         Guid ticketId,
-        Guid userId)
+        Guid userId,
+        UserRole userRole)
     {
         var ticket = await _dbContext.Tickets
             .AsNoTracking()
-            .FirstOrDefaultAsync(x =>
-                x.Id == ticketId &&
-                x.CreatedById == userId);
+            .FirstOrDefaultAsync(x => x.Id == ticketId);
 
         if (ticket is null)
         {
             return null;
+        }
+
+        var hasAccess = userRole switch
+        {
+            UserRole.Customer =>
+                ticket.CreatedById == userId,
+
+            UserRole.Agent =>
+                ticket.AssignedToId == userId,
+
+            UserRole.Admin =>
+                true,
+
+            _ => false
+        };
+
+        if (!hasAccess)
+        {
+            throw new UnauthorizedAccessException(
+                "You do not have access to this ticket.");
         }
 
         return MapToResponse(ticket);

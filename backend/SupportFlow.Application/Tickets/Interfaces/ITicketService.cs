@@ -20,7 +20,8 @@ public interface ITicketService
 
     Task<TicketResponse?> GetByIdAsync(
         Guid ticketId,
-        Guid userId);
+        Guid userId,
+        UserRole userRole);
 
     Task<TicketResponse?> UpdateStatusAsync(
         Guid ticketId,

@@ -101,28 +101,42 @@ public class TicketsController : ControllerBase
         Guid id)
     {
         var userId = GetCurrentUserId();
+        var userRole = GetCurrentUserRole();
 
-        if (userId is null)
+        if (userId is null || userRole is null)
         {
             return Unauthorized(new
             {
-                message = "Invalid user identifier."
+                message = "Invalid user information."
             });
         }
 
-        var ticket = await _ticketService.GetByIdAsync(
-            id,
-            userId.Value);
-
-        if (ticket is null)
+        try
         {
-            return NotFound(new
-            {
-                message = "Ticket not found."
-            });
-        }
+            var ticket = await _ticketService.GetByIdAsync(
+                id,
+                userId.Value,
+                userRole.Value);
 
-        return Ok(ticket);
+            if (ticket is null)
+            {
+                return NotFound(new
+                {
+                    message = "Ticket not found."
+                });
+            }
+
+            return Ok(ticket);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                new
+                {
+                    message = ex.Message
+                });
+        }
     }
 
     // PATCH: /api/tickets/{id}/status
