@@ -1,0 +1,31 @@
+name: SupportFlow CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore SupportFlow.slnx
+
+      - name: Build
+        run: dotnet build SupportFlow.slnx --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test SupportFlow.slnx --no-build --configuration Release
